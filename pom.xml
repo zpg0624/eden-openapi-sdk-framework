@@ -9,11 +9,11 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>openapi-sdk-api</module>
     <module>openapi-sdk-core</module>
     <module>openapi-sdk-service</module>
     <module>openapi-sdk-framework</module>
-      <module>openapi-sdk-web</module>
+    <module>openapi-sdk-web</module>
+    <module>openapi-sdk-web-common</module>
   </modules>
   <name>eden-openapi-sdk-framework</name>
 

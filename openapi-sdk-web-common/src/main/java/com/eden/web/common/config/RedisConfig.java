@@ -2,8 +2,10 @@ package com.eden.web.common.config;
 
 import com.eden.web.common.properties.RedisConfigProperties;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -28,10 +30,12 @@ import static org.springframework.data.redis.serializer.RedisSerializationContex
  */
 
 @Configuration
+@EnableCaching
 @EnableConfigurationProperties(RedisConfigProperties.class)
 public class RedisConfig extends CachingConfigurerSupport {
 
     @Bean
+    @ConditionalOnMissingBean
     public GenericObjectPoolConfig genericObjectPoolConfig() {
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         config.setMaxIdle(200);
@@ -42,6 +46,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public RedisConnectionFactory lettuceConnectionFactory(GenericObjectPoolConfig poolConfig, RedisConfigProperties redisConfigProperties) {
         String[] nodeHosts = redisConfigProperties.getHosts().split(",");
         RedisClusterConfiguration configuration = new RedisClusterConfiguration(Arrays.asList(nodeHosts));
@@ -56,6 +61,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public <T> RedisTemplate<String, T> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, T> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
@@ -68,6 +74,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public RedisCacheConfiguration cacheConfiguration(RedisConfigProperties redisConfigProperties) {
         return RedisCacheConfiguration
                 .defaultCacheConfig()

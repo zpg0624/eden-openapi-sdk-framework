@@ -1,6 +1,7 @@
 package com.eden.web.common.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -13,7 +14,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ExecutorConfig {
 
     @Bean
-    public Executor asyncServiceExecutor() {
+    @ConditionalOnMissingBean(Executor.class)
+    public ThreadPoolTaskExecutor asyncServiceExecutor() {
         log.info("start asyncServiceExecutor");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         //配置核心线程数

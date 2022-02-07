@@ -1,0 +1,6 @@
+# Project exclude paths
+/openapi-sdk-core/target/
+/openapi-sdk-framework/target/
+/openapi-sdk-service/target/
+/openapi-sdk-web/target/
+/openapi-sdk-web-common/target/

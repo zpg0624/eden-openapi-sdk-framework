@@ -1,0 +1,13 @@
+
+redisconfig:
+  hosts: 001,002,003
+  keyPrefix: openapisdk
+  defaultTTL: 60
+
+sign:
+  expiredminutetime: 1440
+
+spring:
+  application:
+    name: apisdkweb
+

@@ -1,6 +1,6 @@
 package com.eden.service;
 
-import com.eden.framework.entity.MemberPermissionEntity;
+import com.eden.core.entity.MemberPermissionEntity;
 
 
 import java.util.List;

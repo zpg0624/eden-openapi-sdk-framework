@@ -1,6 +1,6 @@
 package com.eden.service.impl;
 
-import com.eden.framework.entity.MemberPermissionEntity;
+import com.eden.core.entity.MemberPermissionEntity;
 import com.eden.service.SdkMemberPermissionService;
 import org.springframework.stereotype.Service;
 

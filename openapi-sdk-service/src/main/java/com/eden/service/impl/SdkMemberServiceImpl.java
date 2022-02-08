@@ -1,6 +1,6 @@
 package com.eden.service.impl;
 
-import com.eden.framework.entity.MemberEntity;
+import com.eden.core.entity.MemberEntity;
 import com.eden.service.SdkMemberService;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.eden.framework.param;
+package com.eden.core.param;
 
 
 import lombok.Getter;
@@ -23,8 +23,8 @@ public class BaseSignParam implements Serializable {
     /**
      * 时间戳
      */
-    @NotNull(message =  "timestamp cannot be empty")
-    private Long   timestamp;
+    @NotNull(message = "timestamp cannot be empty")
+    private Long timestamp;
 
     /**
      * 随机字符串

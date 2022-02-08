@@ -23,20 +23,11 @@
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>com.eden</groupId>
-      <artifactId>openapi-sdk-framework</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>com.eden</groupId>
       <artifactId>openapi-sdk-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-
-
   </dependencies>
 
 

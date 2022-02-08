@@ -8,12 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="openapi-sdk-web" />
-        <module name="openapi-sdk-framework" />
         <module name="openapi-sdk-core" />
         <module name="openapi-sdk-service" />
         <module name="openapi-sdk-web-common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="openapi-sdk-framework" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

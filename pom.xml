@@ -11,7 +11,6 @@
   <modules>
     <module>openapi-sdk-core</module>
     <module>openapi-sdk-service</module>
-    <module>openapi-sdk-framework</module>
     <module>openapi-sdk-web</module>
     <module>openapi-sdk-web-common</module>
   </modules>

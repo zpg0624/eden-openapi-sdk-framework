@@ -2,9 +2,9 @@ package com.eden.web.common.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.eden.core.enums.ResultMsgEnum;
+import com.eden.core.param.BaseSignParam;
 import com.eden.core.resp.ResultWrap;
 import com.eden.core.utils.SignValidateUtils;
-import com.eden.framework.param.BaseSignParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;

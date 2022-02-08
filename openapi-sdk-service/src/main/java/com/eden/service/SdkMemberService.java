@@ -1,6 +1,6 @@
 package com.eden.service;
 
-import com.eden.framework.entity.MemberEntity;
+import com.eden.core.entity.MemberEntity;
 
 import java.util.List;
 

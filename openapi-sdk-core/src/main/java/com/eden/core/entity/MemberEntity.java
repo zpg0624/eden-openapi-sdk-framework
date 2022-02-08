@@ -1,4 +1,4 @@
-package com.eden.framework.entity;
+package com.eden.core.entity;
 
 
 import lombok.Getter;

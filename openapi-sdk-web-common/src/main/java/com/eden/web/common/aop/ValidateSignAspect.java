@@ -1,9 +1,9 @@
 package com.eden.web.common.aop;
 
+import com.eden.core.entity.MemberEntity;
 import com.eden.core.enums.ResultMsgEnum;
+import com.eden.core.param.BaseSignParam;
 import com.eden.core.resp.ResultWrap;
-import com.eden.framework.entity.MemberEntity;
-import com.eden.framework.param.BaseSignParam;
 import com.eden.service.SdkMemberService;
 import com.eden.web.common.handler.SignHandlerAdvice;
 import lombok.extern.slf4j.Slf4j;
@@ -56,9 +56,9 @@ public class ValidateSignAspect {
     @Before("execution(public * com.eden.service.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated) ")
     public void doBefore(JoinPoint joinPoint) {
         Object targetParam = Arrays.stream(joinPoint.getArgs())
-                                                    .filter(x -> x instanceof BaseSignParam)
-                                                    .findAny()
-                                                    .orElseThrow(IllegalArgumentException::new);
+                .filter(x -> x instanceof BaseSignParam)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
         BaseSignParam signParam = (BaseSignParam) targetParam;
         log.info("进入切面签名验证参数:{}", signParam);
         signHandlerAdvice.checkTimeStamp(signParam, time);

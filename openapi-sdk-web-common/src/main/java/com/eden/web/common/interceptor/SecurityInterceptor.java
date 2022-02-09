@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 权限安全拦截
@@ -47,8 +48,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String[] memberInfo = beforeSecurityDetermineInfoProvider.determineHeader(request, response);
-        if (Objects.isNull(memberInfo)) return false;
+        if(beforeSecurityDetermineInfoProvider.determineHeader(request, response))return  false;
         if (beforeSecurityDetermineInfoProvider.determinePermissionAnnotation(response, handler)) return false;
         if (beforeSecurityDetermineInfoProvider.determineMemberAccess(request, response)) return false;
         return true;

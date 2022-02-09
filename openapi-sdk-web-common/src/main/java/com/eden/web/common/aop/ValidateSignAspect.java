@@ -57,17 +57,21 @@ public class ValidateSignAspect {
     @Before("execution(public * com.eden.service.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated) ")
     public void doBefore(JoinPoint joinPoint) {
         Object targetParam = Arrays.stream(joinPoint.getArgs())
-                                   .filter(x -> x instanceof BaseSignParam)
-                                   .findAny()
-                                   .orElseThrow(IllegalArgumentException::new);
+                                    .filter(x -> x instanceof BaseSignParam)
+                                    .findAny()
+                                    .orElseThrow(IllegalArgumentException::new);
         BaseSignParam signParam = (BaseSignParam) targetParam;
-        log.debug("进入切面签名验证参数:{}", signParam);
-        signParamCheckHandler.checkTimeStamp(signParam, time);
+        Optional.of(signParamCheckHandler.checkTimeStamp(signParam, time))
+                .map($_ -> determineMember(signParam))
+                .ifPresent($ -> signParamCheckHandler.checkSign(signParam));
+    }
+
+    private Boolean determineMember(BaseSignParam signParam) {
+        //TODO 可以根据自己的业务获取开放企业用户信息
         List<MemberEntity> memberList = sdkMemberService.list(signParam.getAppKey());
-        log.debug("进入切面签名验证memberList:{}", memberList);
         Optional.ofNullable(CollectionUtils.isEmpty(memberList))
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_MEMBER_APPKEY_ERROR));
         signParam.setSecret(memberList.get(0).getAppSecret());
-        signParamCheckHandler.checkSign(signParam);
+        return Boolean.TRUE;
     }
 }

@@ -55,23 +55,23 @@ public class BeforeSecurityDetermineInfoProvider implements SecurityDetermineInf
     }
 
     @Override
-    public String[] determineHeader(HttpServletRequest request, HttpServletResponse response) {
+    public boolean determineHeader(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(SysConsts.CONST_HEADER_AUTH_PARAM);
         if (StringUtils.isEmpty(authHeader)) {
             SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_AUTH_EMPTY);
-            return null;
+            return true;
         }
         log.info("头部授权参数值:{}", authHeader);
         String header = CommonUtils.decoder(authHeader);
         if (StringUtils.isEmpty(header)) {
             SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_DECODE_ERROR);
-            return null;
+            return true;
         }
         String[] memberInfo = header.split("_");
         if (memberInfo.length != 2) {
             SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_DECODE_ERROR);
-            return null;
+            return true;
         }
-        return memberInfo;
+        return false;
     }
 }

@@ -2,7 +2,6 @@ package com.eden.web.common.aop;
 
 
 import com.eden.core.annotations.Limit;
-import com.eden.core.enums.LimitType;
 import com.eden.core.enums.ResultMsgEnum;
 import com.eden.core.param.RateLimitParam;
 import com.eden.core.provider.RateLimitBuildProvider;
@@ -21,10 +20,9 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 计数器限流算法拦截
@@ -57,11 +55,12 @@ public class LimitRateAspect {
     public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
         Limit limitAnnotation = ((MethodSignature) pjp.getSignature()).getMethod().getAnnotation(Limit.class);
         RedisScript<Number> redisScript = new DefaultRedisScript<>(rateLimitBuildProvider.buildScript(), Number.class);
-        String key = rateLimitBuildProvider.determineKey(RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation, limitAnnotation.limitType()));
-        Number count = limitRedisTemplate.execute(redisScript, Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key)), limitAnnotation.count(), limitAnnotation.period());
-        if (Objects.isNull(count) || count.intValue() > limitAnnotation.count()) {
-            ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_LIMIT_RATE_ERROR);
-        }
+        final RateLimitParam executeRedisDistributedRateLimit = RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation, limitAnnotation.limitType());
+        String key = rateLimitBuildProvider.determineKey(executeRedisDistributedRateLimit);
+        Number count = limitRedisTemplate.execute(redisScript, Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key)),
+                limitAnnotation.count(), limitAnnotation.period());
+        Optional.of(Objects.isNull(count) || count.intValue() > limitAnnotation.count())
+                .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_LIMIT_RATE_ERROR));
         Object proceed = pjp.proceed();
         //TODO 以下可以进行后置增强操作
         return proceed;

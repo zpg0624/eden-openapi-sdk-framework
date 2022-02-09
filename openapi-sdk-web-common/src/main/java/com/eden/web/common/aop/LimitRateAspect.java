@@ -44,6 +44,7 @@ public class LimitRateAspect {
     @Autowired
     RateLimitBuildProvider rateLimitBuildProvider;
 
+
     /**
      * 切入点限流
      *
@@ -54,15 +55,10 @@ public class LimitRateAspect {
      */
     @Around("execution(public * com.eden.web.controller..*(..)) && @annotation(com.eden.core.annotations.Limit)")
     public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
-        MethodSignature signature = (MethodSignature) pjp.getSignature();
-        Method method = signature.getMethod();
-        Limit limitAnnotation = method.getAnnotation(Limit.class);
-        LimitType limitType = limitAnnotation.limitType();
-        String key = rateLimitBuildProvider.determineKey(RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation, limitType));
-        List<String> keys = Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key));
-        String luaScript = rateLimitBuildProvider.buildScript();
-        RedisScript<Number> redisScript = new DefaultRedisScript<>(luaScript, Number.class);
-        Number count = limitRedisTemplate.execute(redisScript, keys, limitAnnotation.count(), limitAnnotation.period());
+        Limit limitAnnotation = ((MethodSignature) pjp.getSignature()).getMethod().getAnnotation(Limit.class);
+        RedisScript<Number> redisScript = new DefaultRedisScript<>(rateLimitBuildProvider.buildScript(), Number.class);
+        String key = rateLimitBuildProvider.determineKey(RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation, limitAnnotation.limitType()));
+        Number count = limitRedisTemplate.execute(redisScript, Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key)), limitAnnotation.count(), limitAnnotation.period());
         if (Objects.isNull(count) || count.intValue() > limitAnnotation.count()) {
             ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_LIMIT_RATE_ERROR);
         }

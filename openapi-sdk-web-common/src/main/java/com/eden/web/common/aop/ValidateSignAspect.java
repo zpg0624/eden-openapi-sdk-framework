@@ -5,7 +5,7 @@ import com.eden.core.enums.ResultMsgEnum;
 import com.eden.core.param.BaseSignParam;
 import com.eden.core.resp.ResultWrap;
 import com.eden.service.SdkMemberService;
-import com.eden.web.common.handler.SignHandlerAdvice;
+import com.eden.web.common.handler.SignParamCheckHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 切面验证签名
@@ -37,7 +38,7 @@ public class ValidateSignAspect {
 
 
     @Autowired
-    SignHandlerAdvice signHandlerAdvice;
+    SignParamCheckHandler signParamCheckHandler;
 
     @Autowired
     SdkMemberService sdkMemberService;
@@ -56,19 +57,17 @@ public class ValidateSignAspect {
     @Before("execution(public * com.eden.service.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated) ")
     public void doBefore(JoinPoint joinPoint) {
         Object targetParam = Arrays.stream(joinPoint.getArgs())
-                .filter(x -> x instanceof BaseSignParam)
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+                                   .filter(x -> x instanceof BaseSignParam)
+                                   .findAny()
+                                   .orElseThrow(IllegalArgumentException::new);
         BaseSignParam signParam = (BaseSignParam) targetParam;
-        log.info("进入切面签名验证参数:{}", signParam);
-        signHandlerAdvice.checkTimeStamp(signParam, time);
-        String appKey = signParam.getAppKey();
-        List<MemberEntity> memberList = sdkMemberService.list(appKey);
-        log.info("进入切面签名验证memberList:{}", memberList);
-        if (CollectionUtils.isEmpty(memberList)) {
-            ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_MEMBER_APPKEY_ERROR);
-        }
+        log.debug("进入切面签名验证参数:{}", signParam);
+        signParamCheckHandler.checkTimeStamp(signParam, time);
+        List<MemberEntity> memberList = sdkMemberService.list(signParam.getAppKey());
+        log.debug("进入切面签名验证memberList:{}", memberList);
+        Optional.ofNullable(CollectionUtils.isEmpty(memberList))
+                .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_MEMBER_APPKEY_ERROR));
         signParam.setSecret(memberList.get(0).getAppSecret());
-        signHandlerAdvice.checkSign(signParam);
+        signParamCheckHandler.checkSign(signParam);
     }
 }

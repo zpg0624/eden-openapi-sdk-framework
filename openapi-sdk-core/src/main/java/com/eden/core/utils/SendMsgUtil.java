@@ -2,8 +2,6 @@ package com.eden.core.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.eden.core.enums.ResultMsgEnum;
-import com.eden.core.resp.ResultWrap;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,6 +17,7 @@ public class SendMsgUtil {
 
     /**
      * 将某个对象转换成json格式并发送到客户端
+     *
      * @param response
      * @param obj
      * @throws Exception
@@ -35,12 +34,4 @@ public class SendMsgUtil {
             e.printStackTrace();
         }
     }
-
-
-    public static void sendJsonMsg(HttpServletResponse response, ResultMsgEnum msgEnum) {
-        ResultWrap resultWrap = ResultWrap.getInstance()
-                                          .buildFailed(msgEnum);
-        SendMsgUtil.sendJsonMessage(response, resultWrap);
-    }
-
 }

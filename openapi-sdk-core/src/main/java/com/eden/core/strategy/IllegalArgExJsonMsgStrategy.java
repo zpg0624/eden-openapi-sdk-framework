@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 public class IllegalArgExJsonMsgStrategy implements ExRespJsonMsgStrategy {
     @Override
     public void sendRespMsg(HttpServletResponse response, Throwable e) {
-        log.info("Illegal args exception :{}", e);
+        log.info("Illegal args exception:", e);
         SendMsgUtil.sendJsonMessage(response,
                 ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_PARAM_ERROR));
     }

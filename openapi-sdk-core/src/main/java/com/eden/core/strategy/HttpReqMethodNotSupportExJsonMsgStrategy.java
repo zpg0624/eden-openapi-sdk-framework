@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 public class HttpReqMethodNotSupportExJsonMsgStrategy implements ExRespJsonMsgStrategy {
     @Override
     public void sendRespMsg(HttpServletResponse response, Throwable e) {
+        log.info("HttpReqMethodNotSupport args exception:", e);
         SendMsgUtil.sendJsonMessage(response, ResultWrap.getInstance().buildFailedThenMsg(e.getMessage()));
     }
 }

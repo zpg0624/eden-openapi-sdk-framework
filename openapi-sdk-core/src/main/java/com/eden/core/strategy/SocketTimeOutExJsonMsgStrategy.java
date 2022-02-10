@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SocketTimeOutExJsonMsgStrategy implements ExRespJsonMsgStrategy {
     @Override
     public void sendRespMsg(HttpServletResponse response, Throwable e) {
-        log.info("SocketTimeout args exception :{}", e);
+        log.info("SocketTimeout args exception:", e);
         SendMsgUtil.sendJsonMessage(response,
                 ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_TIMEOUT_ERROR));
     }

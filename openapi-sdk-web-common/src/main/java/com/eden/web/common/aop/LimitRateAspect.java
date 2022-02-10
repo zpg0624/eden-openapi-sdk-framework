@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -64,10 +63,11 @@ public class LimitRateAspect {
         Number count = limitRedisTemplate.execute(redisScript, Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key)),
                 limitAnnotation.count(), limitAnnotation.period());
         Optional.ofNullable(count)
-                .filter(c -> Objects.isNull(count) || count.intValue() > limitAnnotation.count())
+                .filter(c -> count.intValue() > limitAnnotation.count())
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_LIMIT_RATE_ERROR));
         Object proceed = pjp.proceed();
         //TODO 以下可以进行后置增强操作
         return proceed;
     }
+
 }

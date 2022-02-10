@@ -38,9 +38,9 @@ public class ValidateParamAspect  {
     @Before("execution(public * com.eden.web.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated)")
     public void doBefore(JoinPoint joinPoint) {
         Arrays.stream(joinPoint.getArgs())
-              .filter(x -> x instanceof BindingResult)
-              .map(x -> (BindingResult) x)
-              .filter(x -> x.hasErrors())
+              .filter(BindingResult.class::isInstance)
+              .map(BindingResult.class::cast)
+              .filter(BindingResult::hasErrors)
               .findAny()
               .ifPresent(x -> ResultWrap.getInstance()
                                         .buildFailed(ResultMsgEnum.RESULT_AUTH_PARAM_ERROR)

@@ -26,7 +26,6 @@ import java.util.Optional;
  * @author eden 【】
  * @since 2019-10-28 16:11
  */
-
 @Slf4j
 @Component
 @Aspect
@@ -35,14 +34,10 @@ public class ValidateSignAspect {
 
     @Value("${sign.expiredminutetime}")
     String time;
-
-
     @Autowired
     SignParamCheckHandler signParamCheckHandler;
-
     @Autowired
     SdkMemberService sdkMemberService;
-
 
     /**
      * 切入controller校验签名是否正确
@@ -54,24 +49,24 @@ public class ValidateSignAspect {
      * @author eden 【】
      * @since 2019/10/28
      */
-    @Before("execution(public * com.eden.service.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated) ")
+    @Before("execution(public * com.eden.service.controller..*(..)) " +
+            "&& @annotation(org.springframework.validation.annotation.Validated) ")
     public void doBefore(JoinPoint joinPoint) {
-        Object targetParam = Arrays.stream(joinPoint.getArgs())
-                                    .filter(x -> x instanceof BaseSignParam)
-                                    .findAny()
-                                    .orElseThrow(IllegalArgumentException::new);
-        BaseSignParam signParam = (BaseSignParam) targetParam;
-        Optional.of(signParamCheckHandler.checkTimeStamp(signParam, time))
-                .map($_ -> determineMember(signParam))
-                .ifPresent($ -> signParamCheckHandler.checkSign(signParam));
+        Arrays.stream(joinPoint.getArgs())
+                .filter(BaseSignParam.class::isInstance)
+                .map(BaseSignParam.class::cast)
+                .map(signParam -> signParamCheckHandler.checkTimeStamp(signParam, time))
+                .map(this::determineMember)
+                .findFirst()
+                .ifPresent($ -> signParamCheckHandler.checkSign($));
     }
 
-    private Boolean determineMember(BaseSignParam signParam) {
+    private BaseSignParam determineMember(BaseSignParam signParam) {
         //TODO 可以根据自己的业务获取开放企业用户信息
         List<MemberEntity> memberList = sdkMemberService.list(signParam.getAppKey());
         Optional.ofNullable(CollectionUtils.isEmpty(memberList))
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_MEMBER_APPKEY_ERROR));
         signParam.setSecret(memberList.get(0).getAppSecret());
-        return Boolean.TRUE;
+        return signParam;
     }
 }

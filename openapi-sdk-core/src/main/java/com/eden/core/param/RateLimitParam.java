@@ -1,7 +1,6 @@
 package com.eden.core.param;
 
 import com.eden.core.annotations.Limit;
-import com.eden.core.enums.LimitType;
 import lombok.*;
 
 @Setter
@@ -16,5 +15,4 @@ public class RateLimitParam {
     @NonNull
     private Limit limitAnnotation;
 
-    private LimitType limitType;
 }

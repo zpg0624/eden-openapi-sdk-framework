@@ -33,11 +33,11 @@ public class SignParamCheckHandler {
      * @since 2019/10/29
      */
     @SneakyThrows
-    public boolean checkTimeStamp(BaseSignParam signParam, String expiredminutetime) {
+    public BaseSignParam checkTimeStamp(BaseSignParam signParam, String expiredminutetime) {
         boolean validateTimeStamp = SignValidateUtils.validateTimeStamp(signParam.getTimestamp(), Integer.valueOf(expiredminutetime));
         Optional.of(!validateTimeStamp)
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_TIME_EXPIRED));
-        return validateTimeStamp;
+        return signParam;
     }
 
     /**

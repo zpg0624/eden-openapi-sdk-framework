@@ -35,7 +35,8 @@ public class ValidateParamAspect  {
     * @author eden 【】
     * @since 2019/10/28
     */
-    @Before("execution(public * com.eden.web.controller..*(..)) && @annotation(org.springframework.validation.annotation.Validated)")
+    @Before("execution(public * com.eden.web.controller..*(..)) " +
+            "&& @annotation(org.springframework.validation.annotation.Validated)")
     public void doBefore(JoinPoint joinPoint) {
         Arrays.stream(joinPoint.getArgs())
               .filter(BindingResult.class::isInstance)

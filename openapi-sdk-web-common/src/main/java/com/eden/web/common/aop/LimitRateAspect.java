@@ -15,7 +15,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
@@ -53,13 +52,19 @@ public class LimitRateAspect {
      */
     @Around("execution(public * com.eden.web.controller..*(..)) && @annotation(com.eden.core.annotations.Limit)")
     public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
-        Limit limitAnnotation = ((MethodSignature) pjp.getSignature()).getMethod().getAnnotation(Limit.class);
-        RedisScript<Number> redisScript = new DefaultRedisScript<>(rateLimitBuildProvider.buildScript(), Number.class);
-        final RateLimitParam executeRedisDistributedRateLimit = RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation, limitAnnotation.limitType());
-        String key = rateLimitBuildProvider.determineKey(executeRedisDistributedRateLimit);
+        final Limit limitAnnotation = Optional.of(pjp)
+                .map(ProceedingJoinPoint::getSignature)
+                .filter(MethodSignature.class::isInstance)
+                .map(MethodSignature.class::cast)
+                .map(MethodSignature::getMethod)
+                .map(method -> method.getAnnotation(Limit.class))
+                .orElseThrow(IllegalArgumentException::new);
+        String key = rateLimitBuildProvider.determineKey(RateLimitParam.of("executeRedisDistributedRateLimit", limitAnnotation));
+        RedisScript<Number> redisScript = RedisScript.of(rateLimitBuildProvider.buildScript(), Number.class);
         Number count = limitRedisTemplate.execute(redisScript, Arrays.asList(StringUtils.join(limitAnnotation.prefix(), key)),
                 limitAnnotation.count(), limitAnnotation.period());
-        Optional.of(Objects.isNull(count) || count.intValue() > limitAnnotation.count())
+        Optional.ofNullable(count)
+                .filter(c -> Objects.isNull(count) || count.intValue() > limitAnnotation.count())
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_LIMIT_RATE_ERROR));
         Object proceed = pjp.proceed();
         //TODO 以下可以进行后置增强操作

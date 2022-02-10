@@ -21,7 +21,7 @@ public class RedisRateLimitBuildProvider implements RateLimitBuildProvider {
     @Override
     public String determineKey(RateLimitParam limitParam) {
         String key;
-        switch (limitParam.getLimitType()) {
+        switch (limitParam.getLimitAnnotation().limitType()) {
             case IP:
                 key = getIpAddress();
                 break;

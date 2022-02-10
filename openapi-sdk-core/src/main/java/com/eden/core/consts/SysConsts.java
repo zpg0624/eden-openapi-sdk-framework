@@ -29,6 +29,8 @@ public class SysConsts {
 
 
 
-    public static final String UNKNOWN = "unknown";
+    public static final String UNDERSCORE_SEPARATOR = "_";
+
+    public static final int HEADER_DEC_COUNT = 2;
 
 }

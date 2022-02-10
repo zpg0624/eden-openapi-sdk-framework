@@ -1,6 +1,7 @@
 package com.eden.core.ex;
 
 import com.eden.core.resp.ResultWrap;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 

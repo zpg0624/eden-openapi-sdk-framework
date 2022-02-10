@@ -29,7 +29,7 @@ public enum ResultMsgEnum {
      */
     RESULT_AUTH_PARAM_ERROR(40000, "param is error", "参数错误"),
 
-    RESULT_AUTH_EMPTY(40001, "authorization is empty", "头部认证信息为空"),
+    RESULT_AUTH_INVALID(40001, "header authentication information is invalid", "头部认证信息不合法"),
 
     RESULT_DECODE_ERROR(40002, "authorization decode error", "认证信息解析错误，请核对"),
 
@@ -45,7 +45,7 @@ public enum ResultMsgEnum {
     RESULT_MEMBER_APPID_ERROR(40007, "member appid information does not exist", "查询不到企业信息，请联系商务人员或者核对APPID"),
 
 
-    RESULT_AUTH_API_ERROR(40008, "member interface is no allowed to invoke", "该企业接口已不允许调用"),
+    RESULT_AUTH_API_ERROR(40008, "enterprise information was not found or the interface was not allowed to be called", "未找到该企业信息或者接口已不允许调用"),
 
 
     RESULT_MEDIA_TYPE_ERROR(40009, "content type not supported", "当前请求类型不支持，请核对是否为application/json"),

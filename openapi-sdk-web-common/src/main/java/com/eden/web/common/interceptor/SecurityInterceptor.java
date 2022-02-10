@@ -1,9 +1,9 @@
 package com.eden.web.common.interceptor;
 
 import com.eden.core.annotations.Access;
+import com.eden.core.provider.SecurityDetermineInfoProvider;
 import com.eden.service.SdkMemberPermissionService;
 import com.eden.service.SdkMemberService;
-import com.eden.web.common.provider.BeforeSecurityDetermineInfoProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,8 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * 权限安全拦截
@@ -30,16 +28,17 @@ public class SecurityInterceptor implements HandlerInterceptor {
     SdkMemberPermissionService sdkMemberPermissionService;
 
     @Autowired
-    BeforeSecurityDetermineInfoProvider beforeSecurityDetermineInfoProvider;
+    SecurityDetermineInfoProvider securityDetermineInfoProvider;
 
     /**
      * 请求之前拦截
      * <p>
      * 1、数据库验证该APPid是否存在
-     *</p>
-     * <p>
-     *   2、判断当前appid企业是否存在该URI路径权限 根据注解权限判断，请查看{@link Access}
      * </p>
+     * <p>
+     * 2、判断当前appid企业是否存在该URI路径权限 根据注解权限判断，请查看{@link Access}
+     * </p>
+     *
      * @param request
      * @param response
      * @param handler
@@ -48,9 +47,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(beforeSecurityDetermineInfoProvider.determineHeader(request, response))return  false;
-        if (beforeSecurityDetermineInfoProvider.determinePermissionAnnotation(response, handler)) return false;
-        if (beforeSecurityDetermineInfoProvider.determineMemberAccess(request, response)) return false;
+        securityDetermineInfoProvider.determineSecurityInfoProcess(request, response, handler);
         return true;
     }
 

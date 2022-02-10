@@ -19,5 +19,11 @@ public interface SdkMemberService {
      * @since 2019/10/30
      */
     List<MemberEntity> list(String appkey);
+    /**
+     * 企业信息列表
+     *
+     * @since 2019/10/30
+     */
+    List<MemberEntity> list();
 
 }

@@ -22,4 +22,9 @@ public class SdkMemberServiceImpl implements SdkMemberService {
     public List<MemberEntity> list(String appkey) {
         return null;
     }
+
+    @Override
+    public List<MemberEntity> list() {
+        return null;
+    }
 }

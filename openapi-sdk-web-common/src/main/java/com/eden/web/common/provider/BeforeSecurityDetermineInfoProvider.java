@@ -4,74 +4,64 @@ import com.eden.core.annotations.Access;
 import com.eden.core.consts.SysConsts;
 import com.eden.core.entity.MemberEntity;
 import com.eden.core.enums.ResultMsgEnum;
+import com.eden.core.ex.ValidateParamsException;
 import com.eden.core.provider.SecurityDetermineInfoProvider;
+import com.eden.core.resp.ResultWrap;
 import com.eden.core.utils.CommonUtils;
-import com.eden.core.utils.SendMsgUtil;
+import com.eden.service.SdkMemberPermissionService;
+import com.eden.service.SdkMemberService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Component
 @Slf4j
-public class BeforeSecurityDetermineInfoProvider implements SecurityDetermineInfoProvider {
+public class BeforeSecurityDetermineInfoProvider extends SecurityDetermineInfoProvider {
+
+    @Autowired
+    SdkMemberService sdkMemberService;
+
+    @Autowired
+    SdkMemberPermissionService sdkMemberPermissionService;
 
 
     @Override
-    public boolean determineMemberAccess(HttpServletRequest request, HttpServletResponse response) {
+    public void determineMemberAccess(HttpServletRequest request, HttpServletResponse response) {
         //TODO 获取会员信息 和权限
-//        List<MemberEntity> memberList = sdkMemberService.list();
-//        if (CollectionUtils.isEmpty(memberList)) {
-//            SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_MEMBER_APPID_ERROR);
-//            return true;
-//        }
-//        List<MemberPermissionEntity> permissionList = sdkMemberPermissionService.list();
-//        if (CollectionUtils.isEmpty(permissionList)) {
-//            SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_AUTH_API_ERROR);
-//            return true;
-//        }
-//
+        Optional.ofNullable(sdkMemberService.list())
+                .filter($ -> !CollectionUtils.isEmpty($))
+                .map(__ -> sdkMemberPermissionService.list())
+                .filter($ -> !CollectionUtils.isEmpty($))
+                .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_API_ERROR)));
+        //TODO 加入当前获取的会员信息到request中供其他地方获取。
         request.setAttribute(SysConsts.CURR_MEMBER, new MemberEntity());
-        return false;
     }
 
     @Override
-    public boolean determinePermissionAnnotation(HttpServletResponse response, Object handler) {
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-            Access permission = handlerMethod.getMethod().getAnnotation(Access.class);
-            if (StringUtils.isEmpty(permission)) {
-                permission = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Access.class);
-            }
-            if (StringUtils.isEmpty(permission) || !permission.required()) {
-                SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_COMMON_API_DISABLE);
-                return true;
-            }
-        }
-        return false;
+    public void determinePermissionAnnotation(HttpServletResponse response, Object handler) {
+        Optional.of(handler)
+                .filter(HandlerMethod.class::isInstance)
+                .map(HandlerMethod.class::cast)
+                .map(handlerMethod -> handlerMethod.getMethodAnnotation(Access.class))
+                .filter(Access::required)
+                .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_COMMON_API_DISABLE)));
     }
 
+
     @Override
-    public boolean determineHeader(HttpServletRequest request, HttpServletResponse response) {
-        String authHeader = request.getHeader(SysConsts.CONST_HEADER_AUTH_PARAM);
-        if (StringUtils.isEmpty(authHeader)) {
-            SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_AUTH_EMPTY);
-            return true;
-        }
-        log.info("头部授权参数值:{}", authHeader);
-        String header = CommonUtils.decoder(authHeader);
-        if (StringUtils.isEmpty(header)) {
-            SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_DECODE_ERROR);
-            return true;
-        }
-        String[] memberInfo = header.split("_");
-        if (memberInfo.length != 2) {
-            SendMsgUtil.sendJsonMsg(response, ResultMsgEnum.RESULT_DECODE_ERROR);
-            return true;
-        }
-        return false;
+    public void determineHeader(HttpServletRequest request, HttpServletResponse response) {
+        Optional.ofNullable(request.getHeader(SysConsts.CONST_HEADER_AUTH_PARAM))
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .map(CommonUtils::decoder)
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .map(header -> header.split(SysConsts.UNDERSCORE_SEPARATOR))
+                .filter($ -> $.length == SysConsts.HEADER_DEC_COUNT)
+                .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_INVALID)));
     }
 }

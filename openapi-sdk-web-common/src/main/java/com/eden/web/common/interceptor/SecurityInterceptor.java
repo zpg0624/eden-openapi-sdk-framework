@@ -21,11 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class SecurityInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    SdkMemberService sdkMemberService;
-
-    @Autowired
-    SdkMemberPermissionService sdkMemberPermissionService;
 
     @Autowired
     SecurityDetermineInfoProvider securityDetermineInfoProvider;

@@ -2,8 +2,7 @@ package com.eden.web.common.interceptor;
 
 import com.eden.core.annotations.Access;
 import com.eden.core.provider.SecurityDetermineInfoProvider;
-import com.eden.service.SdkMemberPermissionService;
-import com.eden.service.SdkMemberService;
+import com.eden.web.common.context.MemberContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -41,7 +40,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
      * @since 2019/10/29
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         securityDetermineInfoProvider.determineSecurityInfoProcess(request, response, handler);
         return true;
     }
@@ -49,14 +48,15 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) throws Exception {
-        //ignore
-
+                           ModelAndView modelAndView) {
+        //reset
+        MemberContext.reset();
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-                                Object handler, Exception ex) throws Exception {
-        //ignore
+                                Object handler, Exception ex) {
+        //reset
+        MemberContext.reset();
     }
 }

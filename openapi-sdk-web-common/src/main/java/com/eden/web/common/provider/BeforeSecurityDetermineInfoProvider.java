@@ -10,7 +10,9 @@ import com.eden.core.resp.ResultWrap;
 import com.eden.core.utils.CommonUtils;
 import com.eden.service.SdkMemberPermissionService;
 import com.eden.service.SdkMemberService;
+import com.eden.web.common.context.MemberContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -39,8 +41,8 @@ public class BeforeSecurityDetermineInfoProvider extends SecurityDetermineInfoPr
                 .map(__ -> sdkMemberPermissionService.list())
                 .filter($ -> !CollectionUtils.isEmpty($))
                 .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_API_ERROR)));
-        //TODO 加入当前获取的会员信息到request中供其他地方获取。
-        request.setAttribute(SysConsts.CURR_MEMBER, new MemberEntity());
+        //TODO 加入当前获取的会员信息到MemberContext中
+        MemberContext.setCurrent(MemberEntity.getInstance());
     }
 
     @Override
@@ -57,9 +59,9 @@ public class BeforeSecurityDetermineInfoProvider extends SecurityDetermineInfoPr
     @Override
     public void determineHeader(HttpServletRequest request, HttpServletResponse response) {
         Optional.ofNullable(request.getHeader(SysConsts.CONST_HEADER_AUTH_PARAM))
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .map(CommonUtils::decoder)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .map(header -> header.split(SysConsts.UNDERSCORE_SEPARATOR))
                 .filter($ -> $.length == SysConsts.HEADER_DEC_COUNT)
                 .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_INVALID)));

@@ -1,20 +1,20 @@
 package com.eden.core.entity;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 
 /**
  * 企业
  *
- * @author eden 【】
+ * @author eden
  * @since 2019-10-29 15:11
  */
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor(staticName = "of")
+@NoArgsConstructor(staticName = "getInstance")
 public class MemberEntity    {
 
     private String name;

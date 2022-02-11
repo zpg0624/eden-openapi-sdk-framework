@@ -1,6 +1,7 @@
 package com.eden.web.common.config;
 
 import com.eden.web.common.interceptor.SecurityInterceptor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 */
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
+
+    @Bean
+    @ConditionalOnMissingBean(ObjectMapper.class)
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
+    }
+
     @Bean
     @ConditionalOnMissingBean(SecurityInterceptor.class)
     public SecurityInterceptor securityInterceptor() {

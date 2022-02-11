@@ -1,12 +1,13 @@
 package com.eden.web.common.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.eden.core.enums.ResultMsgEnum;
 import com.eden.core.param.BaseSignParam;
 import com.eden.core.resp.ResultWrap;
 import com.eden.core.utils.SignValidateUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
@@ -23,6 +24,9 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class SignParamCheckHandler {
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     /**
      * 检查时间戳
@@ -49,10 +53,11 @@ public class SignParamCheckHandler {
      */
     @SneakyThrows
     public void checkSign(BaseSignParam signParam) {
-        Map params = JSONObject.parseObject(JSONObject.toJSONString(signParam), Map.class);
+        final Map params = objectMapper.convertValue(signParam, Map.class);
         String signStr = SignValidateUtils.sortMapByKey(params);
-        log.info("resolveCheckSign params:{}, signStr:{}", params, signStr);
-        Optional.of(!Objects.equals(new String(DigestUtils.md5Digest(signStr.getBytes())).toUpperCase(), signParam.getSign()))
+        log.debug("resolveCheckSign params:{}, signStr:{}", params, signStr);
+        Optional.ofNullable(signStr)
+                .filter(__ -> !Objects.equals(new String(DigestUtils.md5Digest(signStr.getBytes())).toUpperCase(), signParam.getSign()))
                 .ifPresent($ -> ResultWrap.getInstance().buildFailedThenThrow(ResultMsgEnum.RESULT_SIGN_ERROR));
     }
 

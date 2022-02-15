@@ -16,20 +16,20 @@ import java.util.UUID;
 @Slf4j
 public class CommonUtils {
 
-    public static String decoder(String encoderStr) {
-        encoderStr = encoderStr.replace(SysConsts.CONST_PRIFFIX, "").trim();
+    public static String[] decoder(String encoderStr) {
+        encoderStr = encoderStr.replace(SysConsts.USER_AUTH_BASIC, "").trim();
         byte[] decode = Base64.getDecoder().decode(encoderStr);
         try {
-            return new String(decode, "UTF-8");
+            return new String(decode, "UTF-8").split(":");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static String encoder(String appId) {
-        String base64Str = String.format("%s %s", SysConsts.CONST_PRIFFIX,
-                Base64.getEncoder().encodeToString(appId.getBytes()));
+    public static String encoder(String username, String password) {
+        final String encodeToString = Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes());
+        String base64Str = String.format("%s %s", SysConsts.USER_AUTH_BASIC,encodeToString);
         return base64Str;
     }
 
@@ -48,6 +48,8 @@ public class CommonUtils {
         final String s = UUID.randomUUID().toString();
         return s.replace("-", "");
     }
+
+
 
 
 }

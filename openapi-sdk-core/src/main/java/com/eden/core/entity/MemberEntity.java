@@ -17,6 +17,10 @@ import lombok.*;
 @NoArgsConstructor(staticName = "getInstance")
 public class MemberEntity    {
 
+    private String username;
+
+    private String password;
+
     private String name;
 
     private String code;

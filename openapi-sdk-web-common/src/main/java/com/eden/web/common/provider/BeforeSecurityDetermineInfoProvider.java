@@ -20,7 +20,9 @@ import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -61,9 +63,8 @@ public class BeforeSecurityDetermineInfoProvider extends SecurityDetermineInfoPr
         Optional.ofNullable(request.getHeader(SysConsts.CONST_HEADER_AUTH_PARAM))
                 .filter(StringUtils::isNotBlank)
                 .map(CommonUtils::decoder)
-                .filter(StringUtils::isNotBlank)
-                .map(header -> header.split(SysConsts.UNDERSCORE_SEPARATOR))
-                .filter($ -> $.length == SysConsts.HEADER_DEC_COUNT)
+                .map(x -> Arrays.stream(x).collect(Collectors.toList()))
+                .filter(x -> !CollectionUtils.isEmpty(x))
                 .orElseThrow(() -> new ValidateParamsException(ResultWrap.getInstance().buildFailed(ResultMsgEnum.RESULT_AUTH_INVALID)));
     }
 }
